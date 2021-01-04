@@ -1,3 +1,4 @@
+include ':qrscanX'
 include ':qrscan'
 include ':app'
 rootProject.name = "QrScan"
