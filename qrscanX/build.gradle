@@ -37,12 +37,10 @@ dependencies {
     def cameraView = "1.0.0-alpha20"
     def coroutines = "1.4.2"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.3.2'
-    api "androidx.camera:camera-core:${cameraX}"
-    api "androidx.camera:camera-camera2:${cameraX}"
-    api "androidx.camera:camera-lifecycle:${cameraX}"
-    api "androidx.camera:camera-view:${cameraView}"
-    api "androidx.camera:camera-extensions:${cameraView}"
+    compileOnly("androidx.camera:camera-core:${cameraX}")
+    compileOnly("androidx.camera:camera-camera2:${cameraX}")
+    compileOnly("androidx.camera:camera-lifecycle:${cameraX}")
+    compileOnly("androidx.camera:camera-view:${cameraView}")
     compileOnly("com.google.zxing:core:3.3.3")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines}")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines}")
