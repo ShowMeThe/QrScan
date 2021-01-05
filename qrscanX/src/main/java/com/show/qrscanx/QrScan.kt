@@ -1,11 +1,10 @@
-package com.show.qrscanx
+package com.show.qrscanX
 
 import android.content.Context
 import com.google.zxing.Result
-import kotlinx.coroutines.flow.debounce
 
 /**
- *  com.show.qrscanx
+ *  com.show.qrscanX
  *  2021/1/4
  *  22:04
  *  ShowMeThe
@@ -20,11 +19,11 @@ sealed class DecodeType(val debounce:Long){
 
 object QrScan {
 
-    fun decode(context: Context) : QrCodeDecode{
+    fun decode(context: Context) : QrCodeDecode {
         return QrCodeDecode(context, DecodeType.SINGLE())
     }
 
-    fun decode(context: Context,type:DecodeType) : QrCodeDecode{
+    fun decode(context: Context,type: DecodeType) : QrCodeDecode {
         return QrCodeDecode(context, type)
     }
 

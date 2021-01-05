@@ -1,8 +1,7 @@
-package com.show.qrscanx
+package com.show.qrscanX
 
 import android.content.Context
 import android.util.DisplayMetrics
-import android.util.Log
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -23,13 +22,12 @@ import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
 /**
- *  com.show.qrscanx
+ *  com.show.qrscanX
  *  2021/1/4
  *  22:05
  *  ShowMeThe

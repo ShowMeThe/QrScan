@@ -11,4 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <com.show.qrscanX.widget.ViewFinderView
+        android:id="@+id/finder"
+        android:background="@color/black"
+        app:finderScannerDot="20"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
