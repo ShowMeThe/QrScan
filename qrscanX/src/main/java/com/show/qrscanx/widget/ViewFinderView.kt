@@ -31,6 +31,9 @@ class ViewFinderView @JvmOverloads constructor(
     private var dotCount = 10
     private val interpolator = AccelerateDecelerateInterpolator()
     private val listener = ValueAnimator.AnimatorUpdateListener { invalidate() }
+    private val animator = ArrayList<Animator>()
+    private val path = Path()
+
     private val animatorListenerAdapter = object : AnimatorListenerAdapter() {
         override fun onAnimationEnd(animation: Animator?) {
             goAnimator()
@@ -64,6 +67,11 @@ class ViewFinderView @JvmOverloads constructor(
         }
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        stopAnimator()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -86,6 +94,7 @@ class ViewFinderView @JvmOverloads constructor(
 
     private fun createNextRect(): ArrayList<Animator> {
         rects.clear()
+        animator.clear()
         val random = Random(System.currentTimeMillis())
         val animators = ArrayList<Animator>()
         for (i in 0..dotCount) {
@@ -96,6 +105,7 @@ class ViewFinderView @JvmOverloads constructor(
             animators.add(getAnimator(i, rect))
         }
         animators.last().addListener(animatorListenerAdapter)
+        animator.addAll(animators)
         return animators
     }
 
@@ -112,7 +122,7 @@ class ViewFinderView @JvmOverloads constructor(
     }
 
 
-    private val path = Path()
+
     private fun createRect(cx: Float, cy: Float, radius: Float, color: Int, canvas: Canvas) {
         canvas.save()
 
@@ -139,6 +149,29 @@ class ViewFinderView @JvmOverloads constructor(
 
     private class Rect(var cx: Float, var cy: Float) {
         var radius = 0.0f
+    }
+
+    fun starAnimator(){
+        post {
+            goAnimator()
+        }
+    }
+
+    fun stopAnimator(){
+        rects.clear()
+        if(animator.isNotEmpty()){
+            animator.last().removeAllListeners()
+            animator.forEach {
+                it.cancel()
+            }
+            animator.clear()
+        }
+        if (set != null) {
+            set?.removeAllListeners()
+            set?.cancel()
+            set = null
+        }
+        postInvalidate()
     }
 
 
