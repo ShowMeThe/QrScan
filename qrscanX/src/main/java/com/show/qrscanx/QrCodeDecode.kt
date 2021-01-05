@@ -2,23 +2,23 @@ package com.show.qrscanX
 
 import android.content.Context
 import android.util.DisplayMetrics
+import android.util.Log
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import java.lang.Runnable
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
@@ -35,6 +35,7 @@ import kotlin.math.min
 class QrCodeDecode constructor(private val context: Context, private val type: DecodeType) {
 
     companion object {
+        private const val TAG = "QrCodeDecode"
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
     }
@@ -51,8 +52,8 @@ class QrCodeDecode constructor(private val context: Context, private val type: D
     private var preview: Preview? = null
     private var camera: Camera? = null
     private var imageAnalyzer: ImageAnalysis? = null
-    private val channel = BroadcastChannel<Result>(Channel.BUFFERED)
-    private val listeners = ArrayList<WeakReference<ScanningResultListener>>()
+    private val channel = BroadcastChannel<Pair<Boolean, Result?>>(Channel.BUFFERED)
+    private val listeners = ArrayList<ScanningResultListener>()
     private var debounce: Long? = null
     private val defaultBarcodeFormat = arrayListOf(BarcodeFormat.QR_CODE)
 
@@ -76,8 +77,14 @@ class QrCodeDecode constructor(private val context: Context, private val type: D
         return this
     }
 
+    fun restartScanning() {
+        runBlocking {
+            channel.send(false to null)
+        }
+    }
+
     fun addListener(listener: ScanningResultListener): QrCodeDecode {
-        listeners.add(WeakReference(listener))
+        listeners.add(listener)
         return this
     }
 
@@ -130,18 +137,21 @@ class QrCodeDecode constructor(private val context: Context, private val type: D
                 it.setAnalyzer(cameraExecutor, QRCodeAnalyzer())
             }
 
-        GlobalScope.launch(Dispatchers.Main) {
+        lifecycleOwner.lifecycleScope.launchWhenCreated {
             channel
                 .asFlow()
                 .apply {
                     when (type) {
-                        DecodeType.SINGLE() -> distinctUntilChanged { old, new -> old.text == new.text }
-                        DecodeType.CONTINUES() -> debounce(debounce ?: type.debounce)
+                        DecodeType.SINGLE -> distinctUntilChanged()
+                        else -> {
+                        }
                     }
                 }
                 .collect { result ->
                     listeners.forEach {
-                        it.get()?.invoke(result)
+                        result.apply {
+                            it.invoke(first, second)
+                        }
                     }
                 }
         }
@@ -197,15 +207,17 @@ class QrCodeDecode constructor(private val context: Context, private val type: D
             try {
                 val result = reader.decode(bitmap)
                 runBlocking {
-                    channel.send(result)
+                    channel.send(true to  result)
+                    delay(debounce ?: 500)
                     image.close()
                 }
             } catch (e: Exception) {
-                image.close()
+                runBlocking {
+                    channel.send(false to null)
+                    image.close()
+                }
             }
-
         }
-
     }
 
 }

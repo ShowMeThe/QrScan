@@ -10,17 +10,16 @@ import com.google.zxing.Result
  *  ShowMeThe
  */
 
-typealias  ScanningResultListener  = (result:Result)->Unit
+typealias  ScanningResultListener  = (resultOk:Boolean,result:Result?)->Unit
 
-sealed class DecodeType(val debounce:Long){
-    class SINGLE : DecodeType(-1)
-    class CONTINUES : DecodeType(300)
+enum class DecodeType{
+    SINGLE,CONTINUES
 }
 
 object QrScan {
 
     fun decode(context: Context) : QrCodeDecode {
-        return QrCodeDecode(context, DecodeType.SINGLE())
+        return QrCodeDecode(context, DecodeType.SINGLE)
     }
 
     fun decode(context: Context,type: DecodeType) : QrCodeDecode {

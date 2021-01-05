@@ -33,6 +33,7 @@ class ViewFinderView @JvmOverloads constructor(
     private val listener = ValueAnimator.AnimatorUpdateListener { invalidate() }
     private val animator = ArrayList<Animator>()
     private val path = Path()
+    var isStaring = false
 
     private val animatorListenerAdapter = object : AnimatorListenerAdapter() {
         override fun onAnimationEnd(animation: Animator?) {
@@ -81,6 +82,7 @@ class ViewFinderView @JvmOverloads constructor(
     }
 
     private fun goAnimator() {
+        isStaring = true
         if (set != null) {
             set?.cancel()
             set = null
@@ -158,6 +160,7 @@ class ViewFinderView @JvmOverloads constructor(
     }
 
     fun stopAnimator(){
+        isStaring = false
         rects.clear()
         if(animator.isNotEmpty()){
             animator.last().removeAllListeners()
