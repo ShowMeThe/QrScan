@@ -27,7 +27,7 @@ class ViewFinderView @JvmOverloads constructor(
     private var delays = intArrayOf(200, 300, 400, 100, 200, 300, 0, 100, 200)
     private val rects = ArrayList<Rect>()
     private var set: AnimatorSet? = null
-    private var duration = 1500
+    private var duration = 800
     private var dotCount = 10
     private val interpolator = AccelerateDecelerateInterpolator()
     private val listener = ValueAnimator.AnimatorUpdateListener { invalidate() }
